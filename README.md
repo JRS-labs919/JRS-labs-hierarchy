@@ -2,7 +2,7 @@
 
 [![Validate Claude plugin](https://github.com/JRS-labs919/JRS-labs-hierarchy/actions/workflows/validate.yml/badge.svg)](https://github.com/JRS-labs919/JRS-labs-hierarchy/actions/workflows/validate.yml)
 
-JRS is a Claude Code plugin that routes company work through the department that owns it. It includes a front-door router, 26 department skills, and eight tiered agents. Each department follows a five-stage pipeline with one owner, one output, and one handoff per stage.
+JRS turns Claude into your own pocket-sized company—with you in the CEO chair. Claude gets 26 departments, a front-desk router that sends each job to the right team, and eight specialist agents that move work from brief to delivery. You set the direction; your AI company gets to work.
 
 ## Install
 

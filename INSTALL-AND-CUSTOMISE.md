@@ -1,8 +1,8 @@
 # JRS department skills
 
-27 Claude skills that run company work the way departments do: a router plus 26 department skills,
-each a five-stage pipeline with a Principal (the C-suite executive), an Advisor (the department head)
-and one owner role per stage. Hardware and software work are tracks inside each skill.
+Turn Claude into your own pocket-sized company, with you as CEO: a front-door router plus 26
+departments, each with a five-stage team led by a Principal, an Advisor and one owner per stage.
+Hardware and software work are tracks inside each department.
 
 ## Two ways to install - pick one
 

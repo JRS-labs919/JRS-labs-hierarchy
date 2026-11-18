@@ -1,8 +1,8 @@
 {
   "name": "jrs",
   "displayName": "JRS Department Skills",
-  "version": "1.0.1",
-  "description": "JRS department skills: a router, 26 department skills (hardware and software tracks) and 8 tier agents that carry each role's model and effort.",
+  "version": "1.0.2",
+  "description": "Turn Claude into your own pocket-sized company. You're the CEO; 26 departments, a smart router, and tiered agents take work from brief to delivery.",
   "author": {
     "name": "JRS Labs",
     "url": "https://github.com/JRS-labs919"
