@@ -4,7 +4,27 @@
 
 JRS turns Claude into your own pocket-sized company—with you in the CEO chair. Claude gets 26 departments, a front-desk router that sends each job to the right team, and eight specialist agents that move work from brief to delivery. You set the direction; your AI company gets to work.
 
-## Install
+## Install JRS (plugin + all skills)
+
+Install the **JRS plugin once**. It already includes the router, all 26 department skills, eight
+shared agents, and the department house-standard files. Do not install the standalone copies too;
+their triggers overlap with the plugin.
+
+### Claude, Claude Desktop, or Cowork
+
+1. Open **Customize** and select **Plugins**.
+2. Select **Add**, then **Add marketplace**.
+3. Choose **Add from a repository** and enter `JRS-labs919/JRS-labs-hierarchy`.
+4. Open **JRS Department Skills** from that marketplace and select **Add**.
+5. Start a new chat or task, then use `/jrs:route` or a department command such as
+   `/jrs:marketing`.
+
+> [!IMPORTANT]
+> Pasting the GitHub URL into a Claude Code chat does not install JRS. It only gives that session a
+> clone of the source repository. Add the marketplace through **Customize > Plugins**, or use the
+> Claude Code command below.
+
+### Claude Code terminal
 
 With Claude Code 2.1.292 or newer, install directly from this GitHub repository:
 
@@ -19,7 +39,7 @@ claude plugin marketplace add JRS-labs919/JRS-labs-hierarchy
 claude plugin install jrs@jrs-labs919-plugins
 ```
 
-Start a new Claude Code session, then use:
+Start a new Claude Code session (or run `/reload-plugins`), then use:
 
 - `/jrs:route` when you are not sure which department owns the work, or the request crosses departments.
 - `/jrs:<department>` to go straight to one department, such as `/jrs:supply-chain`.
@@ -30,11 +50,15 @@ To try a local clone without installing it:
 claude --plugin-dir .
 ```
 
-## Standalone Claude skills
+## Standalone skills (optional alternative)
 
-The [`packages/standalone`](packages/standalone) directory contains the same 27 workflows as individual `.skill` files for Claude.ai. Install `jrs-route.skill` first, then only the departments you need.
+The [`packages/standalone`](packages/standalone) directory contains the same 27 workflows as
+individual `.skill` files. Use these only when you want selected departments without the complete
+plugin. Install `jrs-route.skill` first, then only the departments you need.
 
-Do not install the standalone skills and the plugin in the same environment: their triggers overlap. The plugin is the richer option for Claude Code because it also includes shared agents and per-department house-standard files.
+Do not install the standalone skills and the plugin in the same account or environment: their
+triggers overlap. The plugin is the complete JRS experience because it also includes shared agents
+and per-department house-standard files.
 
 ## Customize before relying on it
 

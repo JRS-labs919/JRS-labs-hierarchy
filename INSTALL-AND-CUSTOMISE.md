@@ -6,14 +6,20 @@ Hardware and software work are tracks inside each department.
 
 ## Two ways to install - pick one
 
-- **Plugin** (recommended for Claude Code): install this GitHub repository with
-  `claude plugin install jrs --marketplace JRS-labs919/JRS-labs-hierarchy`. It includes the router,
-  every department, 8 agents that carry each role's model and effort, and a `house-standards.md`
-  per department. Invoke it as `/jrs:route` or `/jrs:<department>`.
-- **Standalone skills** (`packages/standalone/*.skill`): install each file through Claude.ai skill
-  settings. Start with `jrs-route.skill`, then add only the departments you need.
+- **Plugin** (recommended): it includes the router, every department, eight agents that carry each
+  role's model and effort, and a `house-standards.md` per department. In Claude, Claude Desktop, or
+  Cowork, open **Customize > Plugins > Add > Add marketplace**, choose **Add from a repository**,
+  enter `JRS-labs919/JRS-labs-hierarchy`, then add **JRS Department Skills**. In a Claude Code
+  terminal, run `claude plugin install jrs --marketplace JRS-labs919/JRS-labs-hierarchy`.
+  Invoke it as `/jrs:route` or `/jrs:<department>`.
+- **Standalone skills** (`packages/standalone/*.skill`): use these only when you want selected
+  departments instead of the complete plugin. Start with `jrs-route.skill`, then add only the
+  departments you need.
 
 Do not install both: their triggers overlap.
+
+Pasting the repository URL into a Claude Code chat only clones the source for that session. It does
+not install the plugin or activate its skills.
 
 ## Make it yours
 
