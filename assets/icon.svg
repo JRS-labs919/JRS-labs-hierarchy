@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#101b3a"/>
+      <stop offset="1" stop-color="#07101f"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#63a4ff"/>
+      <stop offset="1" stop-color="#5ce1e6"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="208" fill="url(#background)"/>
+  <path d="M192 224h640" stroke="url(#accent)" stroke-width="28" stroke-linecap="round"/>
+  <text x="512" y="620" fill="#f7fbff" font-family="DejaVu Sans, sans-serif" font-size="360" font-weight="700" text-anchor="middle" letter-spacing="-32">JRS</text>
+  <path d="M288 780h448" stroke="#b8c7e6" stroke-width="22" stroke-linecap="round"/>
+  <circle cx="288" cy="780" r="45" fill="#63a4ff"/>
+  <circle cx="512" cy="780" r="45" fill="#7cb7ff"/>
+  <circle cx="736" cy="780" r="45" fill="#5ce1e6"/>
+</svg>

@@ -1,0 +1,19 @@
+{
+  "name": "jrs",
+  "displayName": "JRS Department Skills",
+  "version": "1.0.1",
+  "description": "JRS department skills: a router, 26 department skills (hardware and software tracks) and 8 tier agents that carry each role's model and effort.",
+  "author": {
+    "name": "JRS Labs",
+    "url": "https://github.com/JRS-labs919"
+  },
+  "homepage": "https://github.com/JRS-labs919/JRS-labs-hierarchy#readme",
+  "repository": "https://github.com/JRS-labs919/JRS-labs-hierarchy",
+  "icon": "./assets/icon.png",
+  "keywords": [
+    "departments",
+    "workflow",
+    "hardware",
+    "software"
+  ]
+}

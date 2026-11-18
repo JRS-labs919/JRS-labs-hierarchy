@@ -1,0 +1,15 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "jrs-labs919-plugins",
+  "description": "Claude Code plugins maintained by JRS Labs",
+  "owner": {
+    "name": "JRS Labs"
+  },
+  "plugins": [
+    {
+      "name": "jrs",
+      "source": "./",
+      "description": "A router, 26 department workflows, and tiered agents for structured company work."
+    }
+  ]
+}

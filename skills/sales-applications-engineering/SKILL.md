@@ -1,0 +1,313 @@
+---
+name: "sales-applications-engineering"
+description: Take a customer RFQ, spec or technical inquiry to a compliant technical proposal with scope, clarifications and an estimate. Use for "quote this", "review this RFQ", "build the estimate" or /jrs:sales-applications-engineering. Not for account strategy and customer messaging (use jrs:sales).
+---
+
+# JRS-Sales-Applications-Engineering
+
+Turn a customer's documents into a scope we can stand behind, with every deviation and every price traceable. 5 stages, each with one owner role, one output and one handoff -
+an applications engineering group with the meetings removed.
+
+| # | Stage | Role | Model | Effort | Output (the handoff) |
+|---|---|---|---|---|---|
+| - | Escalations | Principal (Chief Revenue Officer) - rules on escalations, final sign-off (Standard size) | Fable 5.2 | Max | Rulings and release sign-off |
+| - | All | Advisor (Director, Applications Engineering) - plans, gates, dispatches, integrates | Fable 5.2 | Medium | Gate decisions, integrated output |
+| 1 | Intake | HW: Applications Engineer / SW: Solutions Engineer | Opus 5.5 | High | Requirements brief |
+| 2 | Solution | HW: Sales Engineer / SW: Pre-Sales Consultant | Opus 5.5 | High | Solution plan |
+| 3 | Build | HW: Estimator or Quote Engineer / SW: Demo Engineer | Sonnet 5.5 | Medium | Scope, estimate or demo |
+| 4 | Review | HW: Applications Engineer (second reader) / SW: Solutions Engineer (second reader) | Opus 5.5 | High | Pass/fail per criterion |
+| 5 | Submit | Proposal Manager | Sonnet 5.5 | Low | Proposal package |
+
+Each delegated role is dispatched to the plugin's tier agent that matches its row: Opus 5.5 rows
+to `senior-high` or `senior-medium`, Sonnet 5.5 rows to `builder-high`, `builder-medium` or
+`builder-low`, Haiku 5.5 rows to `clerk`, and escalations to `principal`. This skill uses `builder-low`, `builder-medium`, `senior-high`.
+
+Send one packet per stage, not the conversation:
+
+```
+ROLE: <title from the table>
+STAGE: <n - name>, with that stage's section of this skill
+INPUT: <the handoff from the stage before; the record path if Standard size>
+RULES: <the ground rules of this skill>
+RETURN: <that stage's handoff, plus OPEN ITEMS>
+```
+
+The Advisor does not hand off its own row (planning, gates, integration). The Principal is never
+dispatched for work - only consulted through the escalation protocol below. If the tier agents
+are not available in this environment, the Advisor runs that stage itself and logs
+`<role> model/effort NOT SET - ran in session` in the open items.
+
+### Fable fallback
+
+Fable usage can run out, so every job checks the model once at the start and keeps working either way.
+
+| Role | Fable available | Fallback (no Fable) |
+|---|---|---|
+| Principal | Fable 5.2 / Max | Opus 5.5 / Max |
+| Advisor | Fable 5.2 / Medium | Opus 5.5 / Max |
+| Stages 1-5 | as in the table above | unchanged |
+
+- **Check at the start.** Run on Fable when the session is on Fable 5.2. Use the fallback when the
+  session is on any other model, or when the user says to.
+  If the request arrives from the router with a `MODELS:` line, use that and skip the check.
+- **Switch mid-job only on failure.** If a Fable call fails for usage or availability partway
+  through, switch to the fallback for the rest of the job, log the stage where it switched, and do
+  not switch back.
+- **The Advisor runs in the session.** Under fallback the session should be Opus 5.5 at max effort. If
+  it is another model, or the effort cannot be set, carry on and log `ADVISOR <model/effort> -
+  fallback expects Opus 5.5 / Max` in the open items.
+- **Principal agent.** Escalations go to `principal` on Fable and to `principal-opus` under fallback.
+- **Say which ran.** The record and the report carry a `MODELS:` line.
+
+The user is the account owner, acting for the end customer. Their prompt, plus anything they attached or pointed
+to, **is** the customer inquiry. Stage 1's job is to turn it into the requirements brief, not to send
+it back as a questionnaire.
+
+## Keep it small
+
+The point of the stages is to catch the expensive mistakes early: missing a requirement buried in the spec,
+an estimate with a gap or a double count, a deviation the customer finds before we tell them. Anything beyond that is overhead, so apply one test
+to every task you are about to add:
+
+> Does this change the scope, the price or the risk we are taking, or prove the proposal complies? If neither, skip it.
+
+Size the job before starting and say which size you picked:
+
+- **Small** - one item or one spec question with the answer in a datasheet. Run all stages in the conversation: the requirement, our answer, the source, a compliance check, the reply. No record file.
+- **Standard** - anything larger. Keep one record file, `jrs/sales-applications-engineering/<slug>.md`, with one
+  section per stage (template at the end).
+
+Pick the track too, because it changes who owns each stage and what counts as proof:
+
+- **Hardware** - equipment, systems and associated services. Read every spec section, drawing and schedule, and list the requirements with their location.
+- **Software** - software configuration, integration and demonstration. Read the requirements, current systems and integration points.
+- **Combined** - a request with both. Run the two tracks side by side under one record and one report; where they depend on each other, name the dependency and its owner.
+
+Say also whether the job is **new** or a **change** to something already released. A change adds
+the Must not break list in Stage 1 and the boundary rule in Stage 3.
+
+## Ground rules
+
+1. **House rules outrank this skill.** Read `house-standards.md` in this skill's folder before
+   Stage 1. Whatever it or the environment defines - quote template, pricing rules, standard clarifications and exceptions, or file naming convention -
+   is followed and noted in the requirements brief. Lines there still marked `REQUIRED INPUT` are not
+   defined yet; ignore them. This skill fills gaps only.
+2. **Never invent facts.** Any price, rating, quantity, lead time, weight, dimension or feature the user did not supply and you cannot read from
+   a source is `TBD` or `REQUIRED INPUT`, and goes in the open items. A default is fine when
+   labelled as an assumption.
+3. **Check it against the customer's own documents.** An estimate that totals is not proof; a criterion passes when each requirement and each line traces to a page and a source. A check that could not run is reported as `NOT RUN`
+   with the reason.
+4. **Nothing is submitted without being asked.** Never send a proposal, state a price or lead time as firm, or accept a customer term unless the user asks.
+5. **Deviations are stated, not hidden.** Anything we do not meet goes in clarifications and exceptions.
+6. **Conflicts in the customer's documents are logged.** Keep a discrepancy register and say which reading the proposal assumes.
+
+## Principal and escalation
+
+**One boss.** The Advisor (Director, Applications Engineering) plans and runs the job. The Principal
+(Chief Revenue Officer) never plans, builds or dispatches; it only rules on what is escalated to it,
+and its ruling is final.
+
+Escalate to the Principal only when:
+
+1. The customer's documents conflict or leave the scope open enough that two different quotes would both fit, and guessing wrong wastes the work (the user is
+   asked first if they are reachable; the Principal rules when they are not, or when the question
+   is technical rather than a preference).
+2. Sources conflict and the conflict cannot be resolved from evidence.
+3. A criterion has failed Stage 4 twice (the re-scope point in Stage 4).
+4. The next step is destructive or irreversible.
+5. Release sign-off - every Standard-size job, before Stage 5 delivers.
+6. The proposal takes an exception to a major requirement, or uses a price or lead time with no source.
+
+**Small size skips the Principal.** The Advisor signs off itself, unless trigger 2 or 4 fires.
+
+**Escalation packet** - send this, not the full history, so the Principal works from fresh
+context:
+
+```
+ESCALATION <n> - trigger <1-6>
+QUESTION: <one sentence>
+OPTIONS: <A / B / C, one line each>
+EVIDENCE: <sources, results, file paths>
+ADVISOR RECOMMENDS: <option + one-line reason>
+```
+
+**Ruling** - the Principal returns:
+
+```
+RULING <n>: <option chosen | other: ...> - <reason, one or two lines>
+CONDITIONS: <anything the Advisor must do or check, if any>
+```
+
+The Advisor applies the ruling and logs it in the record. If the Principal cannot run on Fable,
+send the same packet to the fallback Principal (Opus 5.5 / Max). Only if neither can run does the
+Advisor decide, mark it `PRINCIPAL NOT AVAILABLE - Advisor ruled`, and list it under DECISIONS
+MADE FOR YOU.
+
+## Mode
+
+- **autonomous** (default): show each stage's output briefly and keep going. Decisions made on
+  the user's behalf are listed in the final report so they can overturn any of them.
+- **gated**: stop after Intake and after Solution for a yes/no. Use when the user asks
+  to approve as you go.
+
+In either mode, stop and ask - one short round, all questions together - only when:
+
+- the customer's documents conflict or leave the scope open enough that two different quotes would both fit;
+- the customer's documents or the cost sources cannot be opened;
+- the next step is destructive, irreversible, or needs a credential you do not have.
+
+## Stage 1 - Intake (HW: Applications Engineer / SW: Solutions Engineer)
+
+Turn the inquiry into a requirements brief. Take everything from the prompt and attachments
+first; fill the rest with labelled assumptions or `TBD`.
+
+- **Requirements** - each one with the document and page it came from.
+- **Commercial terms** - due date, validity, delivery, terms and evaluation basis as the customer stated them.
+- **Done when** - 3 to 7 criteria, each checkable by tracing a line to the customer's page and our source. These are what
+  Stage 4 tests.
+- **In scope / Out of scope** - out of scope matters most; it stops the work growing.
+- **Constraints** - pricing rules, lead times, standard product limits, bid deadline, house rules adopted, deadline if given.
+- **Assumptions and TBD** - everything you filled in or could not.
+
+- Hardware track: read every spec section, drawing and schedule, and list the requirements with their location.
+- Software track: read the requirements, current systems and integration points.
+- Change work: before writing this, read the previous quote revision and what the customer said about it and add **Must not break** -
+  prices and scope already offered, and clarifications already agreed.
+
+Handoff: the requirements brief. Autonomous mode shows it and continues; gated mode waits.
+
+## Stage 2 - Solution (HW: Sales Engineer / SW: Pre-Sales Consultant)
+
+Two short pieces of work. Settle the scope boundary (what we supply, what is by others) first.
+
+### Sourcing branch
+
+Decide whether a bought-out item has no current supplier price, then branch:
+
+| Situation | What to do |
+|---|---|
+| Every line has a current cost source | Skip. |
+| A recent quote for the identical item is on file | No branch. Describe it in two or three lines and move on. |
+| A bought-out item has no current supplier price | Run **jrs:supply-chain**. |
+
+When branching, read the jrs:supply-chain skill and follow it as written. Give it:
+
+- the Stage 1 output as its input, so it does not rediscover what is already decided;
+- the same mode (autonomous or gated);
+- the **narrowest stage range that answers the need**, ending at the supplier comparison - not
+  every stage by reflex.
+
+The branch returns the supplier comparison and its own verdict. Record both, then continue. If
+jrs:supply-chain is not installed, do it inline - mark the line `REQUIRED INPUT` and name the suppliers to ask - and log
+`jrs:supply-chain NOT AVAILABLE` in the open items.
+
+### Solution plan
+
+Keep it to what Stage 3 needs to start:
+
+- **Approach** - standard product first; anything custom is named and priced as such. Change work: reuse what exists before adding anything new.
+- **Clarifications and exceptions** - each deviation or assumption, worded for the customer.
+- **Scope of supply** - every line item and service in the proposal. Change work: this list is the boundary; work
+  outside it needs a reason.
+- **Order** - major equipment first, then accessories, then services; smallest complete version first.
+- **Risks** - only the ones that would change the plan.
+
+Handoff: the supplier comparison (if branched) plus the solution plan.
+
+## Stage 3 - Build (HW: Estimator or Quote Engineer / SW: Demo Engineer)
+
+Build the scope and estimate in the order planned. Get the major equipment lines complete first, then widen it.
+
+- Hardware track: build the scope line by line, each with rating, quantity and source; prices come only from a cost source.
+- Software track: map each requirement to a standard feature, a configuration or a gap.
+- Change work: stay inside the scope of supply and match existing conventions.
+- Work against the supplier comparison when the branch ran.
+- If a step shows the plan was wrong, fix the plan in the record, then continue. Do not quietly
+  drift from it.
+- If independent pieces can run in parallel and the environment has subagents, dispatch them
+  with separate write paths. Otherwise work in sequence. Do not parallelise for its own sake.
+
+Handoff: the scope, estimate or demo, in a usable state.
+
+## Stage 4 - Review (HW: Applications Engineer (second reader) / SW: Solutions Engineer (second reader))
+
+Check what was produced against the requirements brief, by walking the customer's documents requirement by requirement.
+
+1. Check every **Done when** criterion and record the evidence: compliance matrix, source per line, discrepancy register.
+2. Hardware track: each requirement is marked comply, deviate or clarify, with the page it came from.
+3. Software track: each requirement is marked standard, configured or gap, and the demo shows what was claimed.
+4. Change work: check every **Must not break** item still holds.
+5. If the branch ran, check the result against the supplier comparison.
+6. Anything that fails goes back to Stage 3. After two failed rounds on the same criterion, stop
+   fixing and re-scope it with the user.
+
+Handoff: a pass/fail line per criterion, with evidence, and any `NOT RUN`. Standard size:
+send the Principal a trigger-5 escalation packet with this evidence before Stage 5.
+
+## Stage 5 - Submit (Proposal Manager)
+
+Hand it over in a state the user can use immediately.
+
+- Deliver the proposal package (scope, clarifications, estimate, discrepancy register), in the form the user asked for or house rules require.
+- Say how to use it, in as few steps as it takes.
+- Change work: say what changed and where.
+- List what is still open.
+
+Report bottom line first, in this shape:
+
+```
+VERDICT: <done | done with open items | blocked> - <n>/<n> criteria passed
+MODELS: <Fable | Fallback - Opus 5.5 / Max for Principal and Advisor (reason, from Stage n)>
+DELIVERED: <deliverable and path, one line each>
+HOW TO USE: <steps>
+CHANGED: <what changed - change work only>
+BRANCH: <not needed | inline | jrs:supply-chain stages x-y, verdict>
+PRINCIPAL: <not used (Small) | n rulings, sign-off: approved / approved with conditions / rejected>
+DECISIONS MADE FOR YOU: <assumptions and provisional choices to confirm or overturn>
+OPEN ITEMS: <TBD, REQUIRED INPUT, NOT RUN, discrepancies>
+NEXT: <at most three follow-ups worth doing, if any>
+```
+
+Leave out any line that has nothing to say.
+
+## Record template (Standard size only)
+
+```markdown
+# <Name> - jrs:sales-applications-engineering
+Track: Hardware | Software | Combined    Work: new | change    Size: Standard    Mode: autonomous | gated
+Models: Fable | Fallback - <reason>, from Stage <n>
+
+## 1. Intake
+Requirements:
+Commercial terms:
+Done when:
+- [ ] AC1
+In scope:
+Out of scope:
+Must not break: (change work)
+Constraints / house rules adopted:
+Assumptions and TBD:
+
+## 2. Solution
+Branch: not needed | inline | jrs:supply-chain stages x-y -> <run folder>, verdict
+Approach:
+Clarifications and exceptions:
+Scope of supply:
+Order:
+Risks:
+
+## 3. Build log
+- <step> - <status> - <plan changes, if any>
+
+## 4. Review
+| Criterion | Result | Evidence |
+|---|---|---|
+
+## Escalations
+| # | Trigger | Question | Ruling | Conditions |
+|---|---|---|---|---|
+
+## 5. Open items
+| # | Item | Type (TBD / REQUIRED INPUT / NOT RUN / discrepancy) | Owner |
+|---|---|---|---|
+```
