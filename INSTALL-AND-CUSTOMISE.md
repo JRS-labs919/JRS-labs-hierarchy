@@ -44,33 +44,33 @@ skill runs that stage in the session and says so.
 
 | Skill | Department | Principal | Advisor |
 |---|---|---|---|
-| `jrs-route` | Router - picks the department and chains them | - | - |
-| `jrs-product-management` | Product Management | Chief Product Officer | VP Product |
-| `jrs-npi-program-management` | NPI & Program Management | Chief Product Officer | Director, PMO |
-| `jrs-design-hw` | Design - Industrial Design | Chief Product Officer | Head of Design |
-| `jrs-design-sw` | Design - UX/UI | Chief Product Officer | Head of Design |
-| `jrs-hardware-engineering` | Hardware Engineering | Chief Technology Officer | VP Hardware Engineering |
-| `jrs-software-engineering` | Software Engineering | Chief Technology Officer | VP Software Engineering |
-| `jrs-platform-infrastructure` | Platform & Infrastructure | Chief Technology Officer | VP Platform |
-| `jrs-data-ai` | Data & AI | Chief Technology Officer | Head of Data |
-| `jrs-systems-engineering` | Systems Engineering | Chief Technology Officer | Chief Systems Engineer |
-| `jrs-engineering-systems` | Engineering Systems | Chief Technology Officer | Manager, Engineering Systems |
-| `jrs-technical-publications` | Technical Publications | Chief Technology Officer | Technical Publications Manager |
-| `jrs-manufacturing` | Manufacturing | Chief Operating Officer | Plant Manager |
-| `jrs-supply-chain` | Supply Chain | Chief Operating Officer | VP Supply Chain |
-| `jrs-quality` | Quality | Chief Operating Officer | VP Quality |
-| `jrs-project-delivery` | Project Delivery | Chief Operating Officer | Director, Project Management |
-| `jrs-field-service` | Field Service & Commissioning | Chief Operating Officer | VP Service |
-| `jrs-remote-monitoring` | Remote Monitoring / NOC | Chief Operating Officer | VP Service |
-| `jrs-ehs` | Environment, Health & Safety | Chief Operating Officer | EHS Manager |
-| `jrs-sales` | Sales | Chief Revenue Officer | VP Sales |
-| `jrs-sales-applications-engineering` | Sales & Applications Engineering | Chief Revenue Officer | Director, Applications Engineering |
-| `jrs-marketing` | Marketing | Chief Revenue Officer | VP Marketing |
-| `jrs-customer-success-support` | Customer Success & Support | Chief Revenue Officer | VP Customer Experience |
-| `jrs-accounting` | Accounting | Chief Financial Officer | Controller |
-| `jrs-fpa` | Financial Planning & Analysis | Chief Financial Officer | FP&A Manager |
-| `jrs-it` | Information Technology | Chief Information Officer | IT Manager |
-| `jrs-security` | Security | Chief Information Security Officer | Security Manager |
+| `jrs:route` | Router - picks the department and chains them | - | - |
+| `jrs:product-management` | Product Management | Chief Product Officer | VP Product |
+| `jrs:npi-program-management` | NPI & Program Management | Chief Product Officer | Director, PMO |
+| `jrs:design-hw` | Design - Industrial Design | Chief Product Officer | Head of Design |
+| `jrs:design-sw` | Design - UX/UI | Chief Product Officer | Head of Design |
+| `jrs:hardware-engineering` | Hardware Engineering | Chief Technology Officer | VP Hardware Engineering |
+| `jrs:software-engineering` | Software Engineering | Chief Technology Officer | VP Software Engineering |
+| `jrs:platform-infrastructure` | Platform & Infrastructure | Chief Technology Officer | VP Platform |
+| `jrs:data-ai` | Data & AI | Chief Technology Officer | Head of Data |
+| `jrs:systems-engineering` | Systems Engineering | Chief Technology Officer | Chief Systems Engineer |
+| `jrs:engineering-systems` | Engineering Systems | Chief Technology Officer | Manager, Engineering Systems |
+| `jrs:technical-publications` | Technical Publications | Chief Technology Officer | Technical Publications Manager |
+| `jrs:manufacturing` | Manufacturing | Chief Operating Officer | Plant Manager |
+| `jrs:supply-chain` | Supply Chain | Chief Operating Officer | VP Supply Chain |
+| `jrs:quality` | Quality | Chief Operating Officer | VP Quality |
+| `jrs:project-delivery` | Project Delivery | Chief Operating Officer | Director, Project Management |
+| `jrs:field-service` | Field Service & Commissioning | Chief Operating Officer | VP Service |
+| `jrs:remote-monitoring` | Remote Monitoring / NOC | Chief Operating Officer | VP Service |
+| `jrs:ehs` | Environment, Health & Safety | Chief Operating Officer | EHS Manager |
+| `jrs:sales` | Sales | Chief Revenue Officer | VP Sales |
+| `jrs:sales-applications-engineering` | Sales & Applications Engineering | Chief Revenue Officer | Director, Applications Engineering |
+| `jrs:marketing` | Marketing | Chief Revenue Officer | VP Marketing |
+| `jrs:customer-success-support` | Customer Success & Support | Chief Revenue Officer | VP Customer Experience |
+| `jrs:accounting` | Accounting | Chief Financial Officer | Controller |
+| `jrs:fpa` | Financial Planning & Analysis | Chief Financial Officer | FP&A Manager |
+| `jrs:it` | Information Technology | Chief Information Officer | IT Manager |
+| `jrs:security` | Security | Chief Information Security Officer | Security Manager |
 
 ## Known limits
 

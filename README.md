@@ -52,8 +52,9 @@ claude --plugin-dir .
 
 ## Standalone skills (optional alternative)
 
-The [`packages/standalone`](packages/standalone) directory contains the same 27 workflows as
-individual `.skill` files. Use these only when you want selected departments without the complete
+The [`packages/standalone`](packages/standalone) directory contains the 27 workflows as
+individual `.skill` files. They are simplified copies: no shared agents and no `house-standards.md`, and
+they are still at version 1.0.3 until rebuilt (see `packages/standalone/README.md`). Use these only when you want selected departments without the complete
 plugin. Install `jrs-route.skill` first, then only the departments you need.
 
 Do not install the standalone skills and the plugin in the same account or environment: their
@@ -103,11 +104,11 @@ See [INSTALL-AND-CUSTOMISE.md](INSTALL-AND-CUSTOMISE.md) for the full setup guid
 - Claude always sees each skill and agent name and description.
 - A full skill body loads only when that skill is used.
 - A department reads its own `house-standards.md`; the other department bodies stay unloaded.
-- Cross-department work is routed one department at a time to keep context focused.
+- Cross-department work is routed one department at a time, in the main session, so each department keeps its tier agents and its Principal. Only a short `HANDOFF:` block moves between them.
 
 ## Models
 
-The agents use the aliases `fable`, `opus`, `sonnet`, and `haiku`, so Claude Code resolves them to the model versions available in the user’s environment. The workflows include an Opus fallback for the Principal when Fable is unavailable.
+The agents use the aliases `fable`, `opus`, `sonnet`, and `haiku`, so Claude Code resolves them to the model versions available in the user’s environment. When the session is not on a Fable model, both the Principal and the Advisor fall back to Opus; the job carries on and reports which ran on its `MODELS:` line.
 
 After installing, use `/agents` to confirm the agent models and effort levels available to your account.
 
@@ -117,12 +118,19 @@ Run the official Claude Code validator before publishing a change:
 
 ```sh
 claude plugin validate --strict .
+python3 scripts/check_release.py
 ```
 
-The GitHub Actions workflow runs the same check on every push and pull request.
+The GitHub Actions workflow runs both checks on every push and pull request.
+
+`tests/routing-prompts.md` lists prompts with the department each should route to. Run them through
+`/jrs:route` (routing only) after any change to the router or to a skill description.
 
 ## Limits
 
 - Test each department with a small request before using it on live work.
 - JRS produces drafts, recommendations, and work products. It does not send, post, release, deploy, or commit unless the user explicitly asks.
 - People and Legal departments are deliberately not included.
+- Every output is a draft for a named, qualified person to approve. A Principal review means "consistent with the criteria and the evidence"; it is never an approval, a stamp or a safety sign-off.
+- If a department cannot reach tier agents, a Principal or the user from inside a subagent, it says
+  `RAN FLAT` on its report and stops as `blocked` on any risk question.

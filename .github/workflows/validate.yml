@@ -24,3 +24,6 @@ jobs:
 
       - name: Validate plugin and marketplace
         run: claude plugin validate --strict .
+
+      - name: Check release consistency
+        run: python3 scripts/check_release.py

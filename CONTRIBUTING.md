@@ -5,7 +5,7 @@
 - Keep the plugin name `jrs`; published Claude Code plugin names are permanent install identifiers.
 - Put plugin components at the repository root. Only the manifest and marketplace catalog belong in `.claude-plugin/`.
 - Keep skill names in kebab case and place each skill at `skills/<name>/SKILL.md`.
-- Treat `packages/standalone/*.skill` as generated distribution artifacts. Update their source workflow first, then rebuild the package.
+- `packages/standalone/*.skill` are distribution copies of the skills. There is no build script yet, so they are rebuilt by hand: update the source skill first, then rebuild the package and note its version in `packages/standalone/README.md`.
 
 ## Validate a change
 
@@ -13,6 +13,7 @@ Run the official validator from the repository root:
 
 ```sh
 claude plugin validate --strict .
+python3 scripts/check_release.py
 ```
 
 Then load the checkout and exercise the changed skill:
