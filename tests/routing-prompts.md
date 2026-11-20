@@ -23,8 +23,8 @@ Re-run this list after any change to `skills/route/SKILL.md` or to a skill's `de
 | 13 | Build a forecast for next year's service revenue. | `jrs:fpa` |
 | 14 | Analyze why returns increased and build a dashboard. | `jrs:data-ai` |
 | 15 | Design this enclosure. | `jrs:design-hw` |
-| 16 | Write a brochure for the new SKU, then produce its manual. | custom chain: `jrs:marketing` -> `jrs:technical-publications` |
-| 17 | Take this lead from first call to a priced quote. | chain: Quote to order |
+| 16 | Write a brochure for the new SKU, then produce its manual. | custom chain in the user's stated order: `jrs:marketing` -> `jrs:technical-publications` |
+| 17 | Take this lead from first call to a priced quote. | chain: Quote to order; when supplier pricing is needed, the declared final step returns to `jrs:sales-applications-engineering` for the priced quote |
 | 18 | The customer complained that their invoice is wrong. | `jrs:customer-success-support` |
 | 19 | Review our contract's liability clause. | none: Legal is not part of this plugin |
 | 20 | We need to swap the motor on a released product and update the floor instructions. | chain: Engineering change |

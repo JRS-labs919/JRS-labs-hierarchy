@@ -2,6 +2,20 @@
 
 All notable changes to JRS will be documented here.
 
+## 1.1.1 - 2026-11-20
+
+Runtime-verification follow-up for routing, review discipline and installation guidance.
+
+- Router: ambiguous procedure-audience and BOM-structure requests now require one short clarification instead of an assumed route.
+- Router: a user's explicit department or deliverable order now wins over a named flow unless the user confirms a reversal.
+- Router: Quote to order now declares its final Applications Engineering pricing pass after Supply Chain instead of improvising a repeat.
+- Router: directive and regulatory conformity routes explicitly flag legal applicability and interpretation for the user's Legal owner.
+- Quality: a request for use-as-is or a concession fires trigger 6 even when the safe recommendation is to hold.
+- All departments: final reports require the literal fenced report block and distinguish Small-job Advisor release review from Principal rulings.
+- All departments: stages cannot be combined when tier agents are available; dependent work waits for a Principal ruling; material post-review edits require re-review.
+- Documentation: added separate update instructions for account-synced Claude installs and Claude Code marketplace installs.
+- Clarified that the department record-path convention applies to Standard records; Small deliverables stay in the conversation unless a file or project edit was requested.
+
 ## 1.1.0 - 2026-11-19
 
 Fixes from the design consult and the supplied runtime-verification findings.

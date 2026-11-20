@@ -50,6 +50,31 @@ To try a local clone without installing it:
 claude --plugin-dir .
 ```
 
+### Update JRS
+
+First check the installed version:
+
+```sh
+claude plugin list
+```
+
+- **Installed through Customize in Claude, Claude Desktop, or Cowork:** this is an account-synced
+  install (shown as `jrs@synced` in Claude Code). Manage it in **Customize > Plugins** on claude.ai;
+  the Claude Code update command cannot update an account-synced copy. Refresh or re-add the
+  `JRS-labs919/JRS-labs-hierarchy` marketplace there, update or re-add **JRS Department Skills**, and
+  start a new session.
+- **Installed from a Claude Code marketplace:** refresh the marketplace, update the fully qualified
+  plugin, and restart Claude Code:
+
+  ```sh
+  claude plugin marketplace update jrs-labs919-plugins
+  claude plugin update jrs@jrs-labs919-plugins
+  ```
+
+If `jrs-labs919-plugins` is not listed by `claude plugin marketplace list`, add the marketplace first
+using the install instructions above. Do not keep the account-synced copy and a local marketplace copy
+enabled together; overlapping JRS versions can route unpredictably.
+
 ## Standalone skills (optional alternative)
 
 The [`packages/standalone`](packages/standalone) directory contains the 27 workflows as

@@ -32,6 +32,9 @@ RULES: <the ground rules of this skill>
 RETURN: <that stage's handoff, plus OPEN ITEMS>
 ```
 
+Do not combine stages in one dispatch when the tier agents are available. Stage 5 must be dispatched
+to its listed owner; do not run it in the session when that tier agent is available.
+
 The Advisor does not hand off its own row (planning, gates, integration). The Principal is never
 dispatched for work - only consulted through the escalation protocol below. If the tier agents
 are not available in this environment, the Advisor runs that stage itself and logs
@@ -89,6 +92,8 @@ to every task you are about to add:
 Size the job before starting and say which size you picked:
 
 - **Small** - one change, one configuration or one control checked against a known standard. Run all stages in the conversation: the asset and boundary, the threats, the finding, the evidence, the fix. No record file.
+  If a Small job needs a file, use the path the user requested; otherwise keep the deliverable in the
+  conversation. The department date-and-topic path below is for Standard records only.
 - **Standard** - anything larger. Keep one record file, `jrs/security/<yyyy-mm-dd>-<topic>.md` under the working folder, with one
   section per stage (template at the end).
 
@@ -161,7 +166,10 @@ RULING <n>: <option chosen | other: ...> - <reason, one or two lines>
 CONDITIONS: <anything the Advisor must do or check, if any>
 ```
 
-The Advisor applies the ruling and logs it in the record. If the Principal cannot run on Fable,
+The Advisor applies the ruling and logs it in the record. Wait for the ruling and apply its conditions
+before dispatching any stage that depends on it. After any stage review or release review,
+a material edit to reviewed content invalidates that review; send the changed content back to the same reviewer
+and repeat any affected release review before Stage 5 delivers. If the Principal cannot run on Fable,
 send the same packet to the fallback Principal (Opus 5.5 / Max). Only if neither can run does the
 Advisor decide, mark it `PRINCIPAL NOT AVAILABLE - Advisor ruled`, and list it under DECISIONS
 MADE FOR YOU. An Advisor ruling is never reported as a Principal review: the report line reads
@@ -256,7 +264,8 @@ Hand it over in a state the user can use immediately.
 - Change work: say what changed and where.
 - List what is still open.
 
-Report bottom line first, in this shape:
+Report bottom line first, in this shape. The final response must contain
+this literal fenced report block with the exact uppercase labels; do not replace it with prose or bold headings:
 
 ```
 VERDICT: <done | done with open items | blocked> - <n>/<n> criteria passed
@@ -264,7 +273,7 @@ MODELS: <Fable | Fallback - Opus 5.5 / Max for Principal and Advisor (reason, fr
 DELIVERED: <deliverable and path, one line each>
 HOW TO USE: <steps>
 CHANGED: <what changed - change work only>
-PRINCIPAL REVIEW: <not used (Small) | n rulings, release review: consistent / consistent with conditions / not consistent | NOT REVIEWED - Principal not available>
+PRINCIPAL REVIEW: <not used (Small); Advisor release review: consistent / consistent with conditions / not consistent | n rulings; Advisor release review (Small): consistent / consistent with conditions / not consistent | n rulings; Principal release review: consistent / consistent with conditions / not consistent | NOT REVIEWED - Principal not available>
 DECISIONS MADE FOR YOU: <assumptions and provisional choices to confirm or overturn>
 OPEN ITEMS: <TBD, REQUIRED INPUT, NOT RUN, discrepancies>
 NEXT: <at most three follow-ups worth doing, if any>

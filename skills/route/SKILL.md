@@ -125,17 +125,31 @@ When two departments fit, use this table before anything else.
 
 Still two candidates: pick the one whose output the user asked for, and name the runner-up in one line.
 Ask the user only when the two outputs are materially different and nothing in the request settles it.
+In that case, do not choose from an assumption: ask one short either/or question and stop before
+dispatch. Two common required-clarification cases are:
+
+- An unnamed audience for a startup or operating procedure: ask whether it is for a technician on
+  site (`jrs:field-service`) or a customer-facing manual (`jrs:technical-publications`).
+- An ambiguous "BOM structure": ask whether it means the product's BOM
+  (`jrs:hardware-engineering`) or the BOM schema/workflow in the tool
+  (`jrs:engineering-systems`).
+
+When routing product conformity to a law, regulation or directive, also flag applicability and legal
+interpretation for the user's Legal owner. Quality owns the conformance evidence; Legal is not part of
+this plugin.
 
 ## Step 3 - Run
 
 **One department.** Invoke the chosen skill with the user's request unchanged, plus the Step 0 and
 Step 1 lines. That skill owns everything from there, including its own Principal and Advisor.
 
-**A chain.** Use a named flow when one fits; go only as far along it as the user asked.
+**A chain.** Use a named flow when one fits; go only as far along it as the user asked. If the user
+states an order (for example, "brochure, then manual"), that order wins and becomes a custom chain.
+Do not reverse it to match a named flow unless the user confirms the change.
 
 | Flow | Departments, in order |
 |---|---|
-| Quote to order | `jrs:sales` -> `jrs:sales-applications-engineering` -> `jrs:supply-chain` (only when a bought-out price is missing) |
+| Quote to order | `jrs:sales` -> `jrs:sales-applications-engineering` (scope and preliminary estimate) -> `jrs:supply-chain` (only when a bought-out price is missing) -> `jrs:sales-applications-engineering` (final priced quote, only when supply chain ran) |
 | Order to delivery | `jrs:project-delivery` -> `jrs:manufacturing` -> `jrs:quality` -> `jrs:field-service` |
 | Idea to launch | `jrs:product-management` -> `jrs:design-hw` or `jrs:design-sw` -> `jrs:systems-engineering` (Combined only) -> `jrs:hardware-engineering` or `jrs:software-engineering` -> `jrs:npi-program-management` |
 | Issue to resolution | `jrs:customer-success-support` or `jrs:remote-monitoring` (see tie-breaks) -> `jrs:field-service` (only when someone must go to site) |
@@ -169,7 +183,8 @@ lines. Every department reads those lines even when there is no `HANDOFF:` block
    cannot work without. Then stop before dispatching it, and ask the user for that input.
 4. Skip a department only when an existing output satisfies that exact flow step; say that you
    skipped it. Do not skip an intentional repeat with a different purpose, such as the final
-   `jrs:quality` effectiveness check in the nonconformance flow.
+   `jrs:quality` effectiveness check in the nonconformance flow or the final
+   `jrs:sales-applications-engineering` pricing pass after supply chain.
 5. A department does not branch to a sibling that is a later step of the chain; the `CHAIN:` line tells
    it which those are. It may still branch to a sibling outside the chain, and does that itself. Do not
    pre-load the sibling.

@@ -21,6 +21,27 @@ Do not install both: their triggers overlap.
 Pasting the repository URL into a Claude Code chat only clones the source for that session. It does
 not install the plugin or activate its skills.
 
+## Update an existing plugin
+
+Run `claude plugin list` to see how JRS is installed.
+
+- If it appears as `jrs@synced`, it came from the Claude account. Update it from **Customize >
+  Plugins** on claude.ai, not from the Claude Code terminal. Refresh or re-add the
+  `JRS-labs919/JRS-labs-hierarchy` marketplace, update or re-add **JRS Department Skills**, and start
+  a new session.
+- If it appears as `jrs@jrs-labs919-plugins`, run:
+
+  ```sh
+  claude plugin marketplace update jrs-labs919-plugins
+  claude plugin update jrs@jrs-labs919-plugins
+  ```
+
+  Then restart Claude Code. If that marketplace is missing, add it again using the install command
+  above.
+
+Do not keep two JRS plugin copies enabled together. A local `--plugin-dir` test can temporarily load a
+release checkout, but an older account-synced copy may still be visible on disk and cause confusion.
+
 ## Make it yours
 
 - Each skill follows your company's own standards first (Ground rule 1). In the plugin, fill in each

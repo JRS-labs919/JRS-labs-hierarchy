@@ -57,6 +57,11 @@ for department in departments:
         "Trigger 6 is this skill's risk trigger",
         "PRINCIPAL REVIEW:",
         "[- RAN FLAT when applicable]",
+        "Do not combine stages in one dispatch",
+        "material edit to reviewed content invalidates that review",
+        "literal fenced report block",
+        "Advisor release review (Small)",
+        "department date-and-topic path below is for Standard records only",
     ):
         require(required in text, f"{label}: missing {required}")
 
@@ -88,6 +93,21 @@ for department in departments:
     claimed_agents = set(re.findall(r"`([a-z-]+)`", uses.group(1)))
     require(claimed_agents == expected_agents, f"{label}: claimed agents differ from stage table")
     require(claimed_agents <= agent_names, f"{label}: references a missing agent")
+
+route_text = (SKILLS / "route" / "SKILL.md").read_text()
+for required in (
+    "do not choose from an assumption: ask one short either/or question",
+    "that order wins and becomes a custom chain",
+    "final priced quote, only when supply chain ran",
+    "flag applicability and legal",
+):
+    require(required in route_text, f"router: missing {required}")
+
+quality_text = (SKILLS / "quality" / "SKILL.md").read_text()
+require(
+    "The user requests, or the recommended disposition is, use-as-is" in quality_text,
+    "quality: use-as-is request does not explicitly fire trigger 6",
+)
 
 all_skill_names = {f"jrs:{path.name}" for path in SKILLS.iterdir() if path.is_dir()}
 referenced_names: set[str] = set()
