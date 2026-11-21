@@ -20,7 +20,9 @@ def add_tree(archive: zipfile.ZipFile, source: Path, prefix: str) -> None:
         if path.is_file() and "__pycache__" not in path.parts:
             name = f"{prefix}/{path.relative_to(source).as_posix()}"
             info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
-            info.compress_type = zipfile.ZIP_DEFLATED
+            # Stored entries are byte-for-byte reproducible across Python and zlib versions.
+            # The complete package set is small enough that compression is not worth CI drift.
+            info.compress_type = zipfile.ZIP_STORED
             info.external_attr = 0o100644 << 16
             archive.writestr(info, path.read_bytes())
 
@@ -52,7 +54,7 @@ def main() -> int:
                 text = text.replace("../_shared/references/", "references/")
                 skill_path.write_text(text)
 
-            with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as archive:
+            with zipfile.ZipFile(target, "w", zipfile.ZIP_STORED) as archive:
                 add_tree(archive, staged, package_name)
 
     print(f"Built {len(skill_dirs)} standalone skill packages in {OUTPUT.relative_to(ROOT)}.")
