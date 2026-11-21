@@ -6,15 +6,15 @@ Hardware and software work are tracks inside each department.
 
 ## Two ways to install - pick one
 
-- **Plugin** (recommended): it includes the router, every department, eight agents that carry each
-  role's model and effort, and a `house-standards.md` per department. In Claude, Claude Desktop, or
+- **Plugin** (recommended): it includes the router, every department, four low-usage support skills,
+  nine agents, deferred references and a `house-standards.md` per department. In Claude, Claude Desktop, or
   Cowork, open **Customize > Plugins > Add > Add marketplace**, choose **Add from a repository**,
   enter `JRS-labs919/JRS-labs-hierarchy`, then add **JRS Department Skills**. In a Claude Code
   terminal, run `claude plugin install jrs --marketplace JRS-labs919/JRS-labs-hierarchy`.
   Invoke it as `/jrs:route` or `/jrs:<department>`.
 - **Standalone skills** (`packages/standalone/*.skill`): use these only when you want selected
-  departments instead of the complete plugin. Start with `jrs-route.skill`, then add only the
-  departments you need.
+  departments instead of the complete plugin. Start with `jrs-route.skill`, add the quick skills you
+  want, then add only the departments you need.
 
 Do not install both: their triggers overlap.
 
@@ -44,6 +44,9 @@ release checkout, but an older account-synced copy may still be visible on disk 
 
 ## Make it yours
 
+- Run `/jrs:onboard` in a company or project workspace. It creates `jrs/company-profile.md` with
+  stable business context and no credentials. Re-run it whenever priorities, tools or terminology
+  materially change.
 - Each skill follows your company's own standards first (Ground rule 1). In the plugin, fill in each
   department's `house-standards.md`; lines left as `REQUIRED INPUT` are ignored.
 - Role titles are generic. Replace them with yours in the role tables, or in house-standards.md.
@@ -73,11 +76,20 @@ The mode can upgrade but cannot downgrade after a department starts. Trigger 4, 
 required safety or Principal call run even when they exceed the usage target. Ask for a mode in the
 request, or let JRS choose. The final `USAGE:` line shows what happened.
 
+For an eligible one-department Lean request, `/jrs:route` uses `jrs:quick-draft`,
+`jrs:quick-review` or `jrs:quick-analysis` instead of loading the full department. These fast paths
+cannot publish, approve, certify, release, disposition or accept risk; they route consequential work
+back to the full department.
+
 ## Skills
 
 | Skill | Department | Principal | Advisor |
 |---|---|---|---|
 | `jrs:route` | Router - picks the department and chains them | - | - |
+| `jrs:onboard` | Company context setup | - | - |
+| `jrs:quick-draft` | Low-risk single draft | - | - |
+| `jrs:quick-review` | Low-risk single-artifact review | - | - |
+| `jrs:quick-analysis` | Low-risk bounded analysis | - | - |
 | `jrs:product-management` | Product Management | Chief Product Officer | VP Product |
 | `jrs:npi-program-management` | NPI & Program Management | Chief Product Officer | Director, PMO |
 | `jrs:design-hw` | Design - Industrial Design | Chief Product Officer | Head of Design |

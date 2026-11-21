@@ -2,6 +2,31 @@
 
 All notable changes to JRS will be documented here.
 
+## 1.3.0 - 2026-11-20
+
+Progressive loading and task-level fast paths reduce routine context and agent usage while preserving
+the existing department and Assurance contracts.
+
+- Added `jrs:quick-draft`, `jrs:quick-review` and `jrs:quick-analysis`. The router uses them only for
+  eligible single-department Lean work; code implementation, chains and consequential work continue
+  through full departments.
+- Added `jrs:onboard`, which creates a compact `jrs/company-profile.md` so stable business context,
+  tool names, vocabulary and output preferences do not need to be rediscovered on every request.
+- Refactored all 26 department skills for progressive disclosure. Always-loaded department bodies
+  now average about 2,830 words, down from roughly 3,600, while Assurance mechanics, escalation
+  protocol and Standard record templates load only when required.
+- Added one generated source for the shared department runtime and Principal contract, plus a CI sync
+  check to prevent the 26 copies drifting apart.
+- Rebuilt all standalone `.skill` packages from the current source and added a repeatable package
+  builder. Users can install only the router, support skills and departments they need.
+- Added an off-by-default experimental Sonnet chain coordinator. It runs only after an explicit user
+  request and a runtime capability probe; failed probes fall back to reliable main-session chaining,
+  and Assurance never uses it.
+- Added explicit prompt-word budgets and seven runtime evaluation cases with a result evaluator for
+  routing, mode, dispatch counts and required report labels.
+- The plugin now contains 31 skills and nine agents: 26 departments, the router, four support skills,
+  eight existing specialists and the optional chain coordinator.
+
 ## 1.2.0 - 2026-11-20
 
 Adaptive usage modes reduce routine agent calls while keeping the full safety and review path for

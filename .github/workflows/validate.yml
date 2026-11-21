@@ -30,3 +30,16 @@ jobs:
 
       - name: Check adaptive usage contract
         run: python3 scripts/check_usage_modes.py
+
+      - name: Check progressive-disclosure prompt budgets
+        run: |
+          python3 scripts/sync_department_contract.py
+          python3 scripts/check_prompt_budgets.py
+
+      - name: Check runtime evaluation cases
+        run: python3 scripts/evaluate_results.py
+
+      - name: Check standalone packages are current
+        run: |
+          python3 scripts/build_standalone.py
+          git diff --exit-code -- packages/standalone

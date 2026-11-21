@@ -31,10 +31,10 @@ match = re.search(r"^## ([0-9]+\.[0-9]+\.[0-9]+) - ", changelog, re.MULTILINE)
 require(match is not None, "CHANGELOG.md has no release heading")
 require(match.group(1) == version, f"plugin version {version} != changelog {match.group(1)}")
 
-departments = sorted(path for path in SKILLS.iterdir() if path.is_dir() and path.name != "route")
+departments = sorted(path for path in SKILLS.iterdir() if (path / "house-standards.md").exists())
 require(len(departments) == 26, f"expected 26 departments, found {len(departments)}")
 agent_names = {path.stem for path in AGENTS.glob("*.md")}
-require(len(agent_names) == 8, f"expected 8 agents, found {len(agent_names)}")
+require(len(agent_names) == 9, f"expected 9 agents, found {len(agent_names)}")
 
 tier_agent = {
     ("Opus 5.5", "High"): "senior-high",
@@ -51,31 +51,36 @@ for department in departments:
     label = department.name
 
     for required in (
-        "**Router and department handoff.**",
-        "**Running inside a subagent.**",
+        "<!-- JRS:SHARED-RUNTIME:START -->",
+        "<!-- JRS:SHARED-RUNTIME:END -->",
+        "<!-- JRS:PRINCIPAL:START -->",
+        "<!-- JRS:PRINCIPAL:END -->",
+        "**Flat runtime.**",
         "**Drafts, not approvals.**",
-        "Trigger 6 is this skill's risk trigger",
         "PRINCIPAL REVIEW:",
         "[- RAN FLAT when applicable]",
-        "## Adaptive usage",
+        "## Adaptive runtime",
         "**Lean**",
         "**Balanced**",
         "**Assurance**",
-        "Target: at most one",
-        "Target: at most two",
-        "Target: five tier-agent",
-        "mandatory Assurance upgrade",
-        "Honor an incoming `RUN MODE:`",
-        "`USAGE SO FAR:` lines",
+        "Budget: 0–1 tier-agent",
+        "Budget: at most two tier-agent",
+        "Budget: five tier-agent",
+        "Honor an incoming `RUN MODE:` only when eligible",
+        "`USAGE BUDGET:` and `USAGE SO FAR:`",
         "USAGE: <Lean | Balanced | Assurance>",
         "n rulings; Stage 4 release check:",
         "Never omit `VERDICT:`, `MODELS:`, `USAGE:` or `PRINCIPAL REVIEW:`",
-        "Stage 4 as the release consistency check",
-        "material edit to reviewed content invalidates that review",
+        "Lean and Balanced use Stage 4 as their release",
+        "references/escalation-protocol.md",
         "literal fenced report block",
         "department date-and-topic path below is for Standard records only",
+        "## Standard record",
+        "references/record-template.md",
     ):
         require(required in text, f"{label}: missing {required}")
+
+    require((department / "references" / "record-template.md").exists(), f"{label}: record reference missing")
 
     for forbidden in (
         "sign-off: approved",
@@ -90,7 +95,7 @@ for department in departments:
         require(forbidden not in text, f"{label}: obsolete text remains: {forbidden}")
 
     escalation = re.search(
-        r"Escalate to the Principal only when:\n(.*?)\n\*\*Release review by mode",
+        r"<!-- JRS:PRINCIPAL:START -->.*?Escalate only when:\n(.*?)\n\nTriggers 1",
         text,
         re.DOTALL,
     )
@@ -127,8 +132,25 @@ for required in (
     "USAGE BUDGET:",
     "USAGE SO FAR:",
     "USAGE: <mode by department; total tier-agent dispatches",
+    "## Step 2.5 - Lean fast path",
+    "jrs:quick-draft",
+    "jrs:quick-review",
+    "jrs:quick-analysis",
+    "jrs/company-profile.md",
+    "references/economy-coordinator.md",
 ):
     require(required in route_text, f"router: missing {required}")
+
+for support in ("onboard", "quick-draft", "quick-review", "quick-analysis"):
+    path = SKILLS / support / "SKILL.md"
+    require(path.exists(), f"support skill missing: {support}")
+    support_text = path.read_text()
+    require("USAGE:" in support_text, f"{support}: usage report missing")
+
+for quick in ("quick-draft", "quick-review", "quick-analysis"):
+    quick_text = (SKILLS / quick / "SKILL.md").read_text()
+    require("0-1 tier-agent dispatches" in quick_text, f"{quick}: Lean budget missing")
+    require("PRINCIPAL REVIEW:" in quick_text, f"{quick}: approval boundary missing")
 
 quality_text = (SKILLS / "quality" / "SKILL.md").read_text()
 require(
@@ -136,12 +158,13 @@ require(
     "quality: use-as-is request does not explicitly fire trigger 6",
 )
 
-all_skill_names = {f"jrs:{path.name}" for path in SKILLS.iterdir() if path.is_dir()}
+all_skill_names = {f"jrs:{path.parent.name}" for path in SKILLS.glob("*/SKILL.md")}
 referenced_names: set[str] = set()
 for path in list(SKILLS.glob("*/SKILL.md")) + [ROOT / "tests" / "routing-prompts.md"]:
     require(path.exists(), f"missing {path.relative_to(ROOT)}")
     referenced_names.update(re.findall(r"jrs:[a-z0-9-]+", path.read_text()))
 missing = referenced_names - all_skill_names
+missing.discard("jrs:department")
 require(not missing, f"references missing skills: {sorted(missing)}")
 
 for principal in ("principal.md", "principal-opus.md"):
@@ -149,13 +172,24 @@ for principal in ("principal.md", "principal-opus.md"):
     require("consistent with conditions" in text, f"{principal}: review vocabulary missing")
     require("It is not an approval" in text, f"{principal}: human-approval boundary missing")
 
-for tier in sorted(agent_names - {"principal", "principal-opus"}):
+for tier in sorted(agent_names - {"principal", "principal-opus", "chain-coordinator"}):
     text = (AGENTS / f"{tier}.md").read_text()
     require("STAGES: one stage in Assurance" in text, f"{tier}: stage-bundle packet missing")
     require("consecutive stage bundle" in text, f"{tier}: bundled execution missing")
     require("Be concise:" in text, f"{tier}: concise handoff rule missing")
 
+coordinator = (AGENTS / "chain-coordinator.md").read_text()
+require("PROBE ONLY" in coordinator, "chain-coordinator: capability probe missing")
+require("never used for Assurance" in coordinator, "chain-coordinator: Assurance exclusion missing")
+require("Return control immediately" in coordinator, "chain-coordinator: handback contract missing")
+
 require((ROOT / "tests" / "usage-mode-prompts.md").exists(), "usage-mode prompt tests missing")
 require((ROOT / "scripts" / "check_usage_modes.py").exists(), "usage-mode contract checker missing")
+require((ROOT / "scripts" / "check_prompt_budgets.py").exists(), "prompt-budget checker missing")
+require((ROOT / "scripts" / "evaluate_results.py").exists(), "runtime evaluation helper missing")
+require((SKILLS / "_shared" / "references" / "assurance-runtime.md").exists(), "Assurance reference missing")
+require((SKILLS / "_shared" / "references" / "escalation-protocol.md").exists(), "escalation reference missing")
+packages = list((ROOT / "packages" / "standalone").glob("jrs-*.skill"))
+require(len(packages) == 31, f"expected 31 standalone packages, found {len(packages)}")
 
-print(f"Release consistency checks passed for JRS {version}: 26 departments, 8 agents.")
+print(f"Release consistency checks passed for JRS {version}: 26 departments, 4 support skills, 9 agents.")

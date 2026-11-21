@@ -1,6 +1,6 @@
 ---
 name: route
-description: Front door for the jrs department skills. Routes a business or engineering request to the one department skill and track (hardware, software or combined) that should handle it, and chains departments for work that crosses them, such as quote to order or idea to launch. Use when the user says "which team handles this", "run this through the departments", "take this from quote to delivery", or /jrs:route, or when a request clearly spans more than one department. Not for requests that name a department skill directly (use that skill).
+description: Front door for JRS. Routes a request to one department, a low-usage quick skill, or a department chain. Use when the user says "which team handles this", "run this through the departments", "take this from quote to delivery", or /jrs:route, or when a request clearly spans departments. Not for requests that name a department skill directly.
 ---
 
 # JRS-Route
@@ -13,12 +13,13 @@ This skill decides and dispatches. It does no department work itself.
 Every department skill costs a few thousand tokens to load. So:
 
 1. Decide from the tables below. Do not open a department skill to find out whether it fits.
-2. Load one department skill at a time, and only the one chosen.
+2. For an eligible single-department Lean draft, review or analysis, load the matching quick skill
+   instead of the full department. Otherwise load one department skill at a time.
 3. In a chain, run each department **in this session**, one after the other. Do not run a department
    in a subagent: nested dispatch, Principal access and user prompts are not available in every
    environment, so the department could lose its review layer. Keep the conversation small another way:
    each department writes its deliverable to a file, and only its Stage 5 report and the HANDOFF block
-   move forward.
+   move forward. The only exception is the explicit, off-by-default experimental coordinator below.
 4. Carry forward the handoff, not the history.
 
 ## Step 0 - Model context (once)
@@ -29,6 +30,10 @@ the session model in Lean and Balanced; do not require Opus merely because the s
 Use the Fable Principal when the session is on Fable and it is available; otherwise use the Opus
 Principal. If a Fable Principal call fails partway through a chain, use Opus for later Principal calls
 and do not redo completed work.
+
+If `jrs/company-profile.md` exists in the working folder, read its headings and only the sections
+needed to route this request. Pass relevant facts forward as `COMPANY CONTEXT:`. If it does not exist,
+continue normally; suggest `/jrs:onboard` only for an open-ended request or repeated missing context.
 
 ## Step 0.5 - Usage mode and budget
 
@@ -157,6 +162,42 @@ dispatch. Two common required-clarification cases are:
 When routing product conformity to a law, regulation or directive, also flag applicability and legal
 interpretation for the user's Legal owner. Quality owns the conformance evidence; Legal is not part of
 this plugin.
+
+## Step 2.5 - Lean fast path
+
+For a one-department request that is eligible for Lean, use exactly one task skill when it fits:
+
+| Requested result | Skill |
+|---|---|
+| One email, brief, summary, outline or other small draft | `jrs:quick-draft` |
+| One supplied artifact checked against a short checklist | `jrs:quick-review` |
+| One bounded comparison or calculation from supplied data | `jrs:quick-analysis` |
+
+Do not use a fast path for code implementation, multi-file changes, a chain, live/send/publish
+actions, production, destructive work, credentials, security findings, safety instructions, legal or
+regulatory interpretation, formal financial work, compliance, approval, release, disposition or risk
+decisions. A direct `/jrs:<department>` request also stays with that department.
+
+Pass the quick skill only the original request plus:
+
+```
+DEPARTMENT: <jrs:department selected in Step 2>
+ROUTE: <track> / <new | change>
+COMPANY CONTEXT: <only relevant facts, or none>
+RUN MODE: Lean - eligible single-task fast path
+USAGE BUDGET: 0-1 tier-agent dispatches
+```
+
+If a quick skill finds the request ineligible, follow its route to the full department; do not force
+the fast path. If the selected quick skill is not installed, use the full department in Lean instead
+of blocking. Quick skills never run as chain steps.
+
+### Experimental economy coordinator
+
+The default remains main-session chaining. Only when the user explicitly asks for the experimental
+or economy coordinator, the chain is Balanced and it has at least three departments, read
+`references/economy-coordinator.md`. Run its capability probe before work. A failed or incomplete
+probe silently returns to the default chain. Never use it for Assurance.
 
 ## Step 3 - Run
 

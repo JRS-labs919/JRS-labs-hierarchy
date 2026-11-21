@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEPARTMENTS = sorted(
-    path for path in (ROOT / "skills").iterdir() if path.is_dir() and path.name != "route"
+    path for path in (ROOT / "skills").iterdir() if (path / "house-standards.md").exists()
 )
 
 
@@ -28,21 +28,20 @@ for department in DEPARTMENTS:
     for mode in ("Lean", "Balanced", "Assurance"):
         require(text.count(f"- **{mode}**") == 1, f"{name}: {mode} mode is not defined once")
 
-    require("Target: at most one" in text, f"{name}: Lean budget missing")
-    require("Target: at most two" in text, f"{name}: Balanced budget missing")
-    require("Target: five tier-agent" in text, f"{name}: Assurance budget missing")
-    require("trigger 4 or 6 fires" in text, f"{name}: mandatory Assurance upgrade missing")
-    require("usage budgets, not safety caps" in text, f"{name}: safety budget exception missing")
-    require("Principal trigger always runs" in text, f"{name}: Principal budget exception missing")
+    require("Budget: 0–1 tier-agent" in text, f"{name}: Lean budget missing")
+    require("Budget: at most two tier-agent" in text, f"{name}: Balanced budget missing")
+    require("Budget: five tier-agent" in text, f"{name}: Assurance budget missing")
+    require("Principal trigger 4 or 6" in text, f"{name}: mandatory Assurance upgrade missing")
+    require("Budgets are not safety caps" in text, f"{name}: safety budget exception missing")
+    require("required Principal calls always run" in text, f"{name}: Principal budget exception missing")
     require("USAGE: <Lean | Balanced | Assurance>" in text, f"{name}: USAGE report line missing")
     require("Never omit `VERDICT:`" in text, f"{name}: required report labels may be omitted")
-    require("Advisor stays in the session" in text, f"{name}: session-model policy missing")
-    require("Lean and Balanced never require a switch to Opus" in text, f"{name}: low-usage model rule missing")
-    require("USAGE BUDGET:` and `USAGE SO FAR:" in text, f"{name}: router usage intake missing")
+    require("Advisor stays on the actual session model" in text, f"{name}: session-model policy missing")
+    require("`USAGE BUDGET:` and `USAGE SO FAR:`" in text, f"{name}: router usage intake missing")
 
-    escalation = text[text.index("Escalate to the Principal only when:") :]
-    require("5. Assurance release review" in escalation, f"{name}: mode-specific trigger 5 missing")
-    require("Trigger 6 is this skill's risk trigger" in escalation, f"{name}: risk trigger missing")
+    escalation = text[text.index("Escalate only when:") : text.index("<!-- JRS:PRINCIPAL:END -->")]
+    require("5. Assurance requires the release-consistency review" in escalation, f"{name}: mode-specific trigger 5 missing")
+    require("\n6. " in escalation, f"{name}: risk trigger missing")
 
 route = (ROOT / "skills" / "route" / "SKILL.md").read_text()
 for required in (
@@ -57,7 +56,7 @@ for required in (
     require(required in route, f"router: missing {required}")
 
 for path in sorted((ROOT / "agents").glob("*.md")):
-    if path.stem in {"principal", "principal-opus"}:
+    if path.stem in {"principal", "principal-opus", "chain-coordinator"}:
         continue
     text = path.read_text()
     require("STAGES: one stage in Assurance" in text, f"{path.stem}: stage bundle packet missing")
@@ -72,4 +71,9 @@ require(
     "builder-high: Balanced bundled-worker role missing",
 )
 
-print("Adaptive usage contract passed: 26 departments, 3 modes, 6 bundle-capable tier agents.")
+for quick in ("quick-draft", "quick-review", "quick-analysis"):
+    text = (ROOT / "skills" / quick / "SKILL.md").read_text()
+    require("USAGE: Lean fast path" in text, f"{quick}: fast-path usage line missing")
+    require("0-1 tier-agent dispatches" in text, f"{quick}: fast-path dispatch budget missing")
+
+print("Adaptive usage contract passed: 26 departments, 3 fast paths, 3 modes, 6 bundle-capable tier agents.")

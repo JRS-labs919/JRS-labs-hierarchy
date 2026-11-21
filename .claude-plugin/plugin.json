@@ -1,8 +1,8 @@
 {
   "name": "jrs",
   "displayName": "JRS Department Skills",
-  "version": "1.2.0",
-  "description": "Turn Claude into your pocket-sized company. You're the CEO; adaptive modes call in anything from a lean crew to the full boardroom.",
+  "version": "1.3.0",
+  "description": "Turn Claude into your pocket-sized company. You're the CEO; quick tasks stay lean and the full boardroom appears only when the stakes demand it.",
   "author": {
     "name": "JRS Labs",
     "url": "https://github.com/JRS-labs919"
@@ -13,6 +13,7 @@
   "keywords": [
     "departments",
     "workflow",
+    "productivity",
     "hardware",
     "software"
   ]
