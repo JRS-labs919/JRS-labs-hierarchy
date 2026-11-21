@@ -51,15 +51,27 @@ release checkout, but an older account-synced copy may still be visible on disk 
 
 ## Models
 
-| Role | Fable available | Fallback (no Fable, or usage ran out) |
-|---|---|---|
-| Principal | Fable 5.2 / Max | Opus 5.5 / Max |
-| Advisor | Fable 5.2 / Medium | Opus 5.5 / Max |
-| Stage roles | Opus 5.5, Sonnet 5.5 or Haiku 5.5, per the skill's table | unchanged |
+| Role | Model behavior |
+|---|---|
+| Advisor | Stays on the current session model in Lean and Balanced |
+| Principal | Fable when the session is on Fable and it is available; otherwise Opus fallback; only when invoked |
+| Balanced worker | Sonnet / High for the bundled build, then Opus / High for independent review |
+| Assurance stages | Opus, Sonnet or Haiku per the department stage table |
 
-The model is checked once at the start; a Fable failure mid-job switches to the fallback for the rest
-of the job. Every report shows a `MODELS:` line. If your environment cannot set a model per role, the
-skill runs that stage in the session and says so.
+Every report shows a `MODELS:` line naming what actually ran. If the environment cannot set a tier
+model, the Advisor runs that work in the session, records the fallback and reports zero tier-agent
+dispatches for it.
+
+## Usage modes
+
+- **Lean:** Small, low-risk and reversible; zero or one tier-agent dispatch.
+- **Balanced:** ordinary default; at most two tier-agent dispatches per department and a target of six
+  for a chain.
+- **Assurance:** the full five-stage process for high-consequence work or when the user asks for it.
+
+The mode can upgrade but cannot downgrade after a department starts. Trigger 4, trigger 6 and every
+required safety or Principal call run even when they exceed the usage target. Ask for a mode in the
+request, or let JRS choose. The final `USAGE:` line shows what happened.
 
 ## Skills
 
@@ -98,5 +110,7 @@ skill runs that stage in the session and says so.
 - Not tested on live work in your environment; run one small request per department you rely on.
 - Plugin agent fields `model` aliases (`fable`, `opus`, `sonnet`, `haiku`) and `effort` should be
   confirmed after install (for example with `/agents` in Claude Code).
+- Runtime token savings depend on the chosen session model and inputs; compare the `USAGE:` dispatch
+  counts during initial testing.
 - Every skill produces drafts and recommendations. It never sends, posts, releases, deploys or
   commits anything unless the user asks.

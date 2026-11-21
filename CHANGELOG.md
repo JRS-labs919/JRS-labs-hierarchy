@@ -2,6 +2,20 @@
 
 All notable changes to JRS will be documented here.
 
+## 1.2.0 - 2026-11-20
+
+Adaptive usage modes reduce routine agent calls while keeping the full safety and review path for
+high-consequence work.
+
+- Added Lean, Balanced and Assurance modes to all 26 departments. Lean targets zero or one tier-agent dispatch; Balanced targets two; Assurance preserves the full five-stage process.
+- Router: Balanced chains target no more than six tier-agent dispatches by using compact intermediate departments and an independently reviewed final department.
+- Safety: trigger 4, trigger 6, stop-and-ask conditions and required Principal calls always override usage budgets and upgrade work to Assurance.
+- Models: Lean and Balanced keep the Advisor on the current session model instead of forcing an Opus fallback; Fable or Opus Principal agents run only when invoked.
+- Agents: the six tier agents can accept consecutive stage bundles and return concise handoffs; Assurance still dispatches one stage at a time.
+- Reports: every department and chain now reports actual mode, tier-agent dispatches, Principal calls and budget status on `USAGE:`.
+- Added `tests/usage-mode-prompts.md`, `scripts/check_usage_modes.py` and a dedicated CI gate for the adaptive-mode contract.
+- Not in this release: the standalone `.skill` packages remain at 1.0.3.
+
 ## 1.1.1 - 2026-11-20
 
 Runtime-verification follow-up for routing, review discipline and installation guidance.

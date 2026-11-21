@@ -27,3 +27,6 @@ jobs:
 
       - name: Check release consistency
         run: python3 scripts/check_release.py
+
+      - name: Check adaptive usage contract
+        run: python3 scripts/check_usage_modes.py

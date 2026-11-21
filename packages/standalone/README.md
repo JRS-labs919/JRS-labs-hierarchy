@@ -8,4 +8,5 @@ The standalone packages contain self-contained workflows. They do not include th
 
 **Version note.** These packages were built from plugin version 1.0.3. They do not yet contain the
 1.1.x changes (risk trigger at every size, drafts-not-approvals rule, handoff block, deterministic
-routing and review-contract fixes). Use the plugin for those until the packages are rebuilt.
+routing and review-contract fixes) or the 1.2.0 adaptive usage modes. Use the plugin for those until
+the packages are rebuilt.

@@ -2,7 +2,10 @@
 
 [![Validate Claude plugin](https://github.com/JRS-labs919/JRS-labs-hierarchy/actions/workflows/validate.yml/badge.svg)](https://github.com/JRS-labs919/JRS-labs-hierarchy/actions/workflows/validate.yml)
 
-JRS turns Claude into your own pocket-sized company—with you in the CEO chair. Claude gets 26 departments, a front-desk router that sends each job to the right team, and eight specialist agents that move work from brief to delivery. You set the direction; your AI company gets to work.
+JRS turns Claude into your own pocket-sized company—with you in the CEO chair. Claude gets 26
+departments, a front-desk router and eight specialist agents. Adaptive modes bring in a lean crew for
+routine work or the full boardroom when the stakes rise. You set the direction; your AI company gets
+to work.
 
 ## Install JRS (plugin + all skills)
 
@@ -131,9 +134,29 @@ See [INSTALL-AND-CUSTOMISE.md](INSTALL-AND-CUSTOMISE.md) for the full setup guid
 - A department reads its own `house-standards.md`; the other department bodies stay unloaded.
 - Cross-department work is routed one department at a time, in the main session, so each department keeps its tier agents and its Principal. Only a short `HANDOFF:` block moves between them.
 
+## Usage modes
+
+JRS chooses the lightest mode that fits the consequence of the work. You can request a mode in the
+prompt, such as `Run this in Lean mode` or `Run the full Assurance process`.
+
+| Mode | Best for | Usage target |
+|---|---|---|
+| **Lean** | Small, low-risk, reversible work | 0-1 tier-agent dispatch |
+| **Balanced** | Ordinary work and most chains; the default | Up to 2 tier-agent dispatches per department; 6 per chain |
+| **Assurance** | Safety, regulatory, security, legal-impact, live, destructive, release or disposition work | Full five-stage dispatch plus required Principal review |
+
+A request automatically upgrades to Assurance when trigger 4 or the department risk trigger fires.
+Usage budgets never suppress a safety gate, blocking question or required Principal call. Every final
+report includes a `USAGE:` line with the actual mode and dispatch count.
+
 ## Models
 
-The agents use the aliases `fable`, `opus`, `sonnet`, and `haiku`, so Claude Code resolves them to the model versions available in the user’s environment. When the session is not on a Fable model, both the Principal and the Advisor fall back to Opus; the job carries on and reports which ran on its `MODELS:` line.
+The agents use the aliases `fable`, `opus`, `sonnet`, and `haiku`, so Claude Code resolves them to the
+model versions available in the user's environment. In Lean and Balanced, the Advisor stays on the
+current session model. Configured tier agents handle only the bundled worker and review calls. A
+Principal uses Fable when the session is on Fable and it is available, otherwise the Opus fallback;
+it is called only when the evidence or Assurance mode requires it. The report states what actually ran
+on its `MODELS:` line.
 
 After installing, use `/agents` to confirm the agent models and effort levels available to your account.
 
@@ -144,12 +167,14 @@ Run the official Claude Code validator before publishing a change:
 ```sh
 claude plugin validate --strict .
 python3 scripts/check_release.py
+python3 scripts/check_usage_modes.py
 ```
 
 The GitHub Actions workflow runs both checks on every push and pull request.
 
 `tests/routing-prompts.md` lists prompts with the department each should route to. Run them through
 `/jrs:route` (routing only) after any change to the router or to a skill description.
+`tests/usage-mode-prompts.md` covers mode selection, budgets, upgrades and model behavior.
 
 ## Limits
 
@@ -159,3 +184,5 @@ The GitHub Actions workflow runs both checks on every push and pull request.
 - Every output is a draft for a named, qualified person to approve. A Principal review means "consistent with the criteria and the evidence"; it is never an approval, a stamp or a safety sign-off.
 - If a department cannot reach tier agents, a Principal or the user from inside a subagent, it says
   `RAN FLAT` on its report and stops as `blocked` on any risk question.
+- Dispatch targets are contractual, but exact token savings depend on the selected session model,
+  prompt, attachments and Claude environment. Use the `USAGE:` line to compare runs.

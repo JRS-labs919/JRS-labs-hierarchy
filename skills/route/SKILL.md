@@ -21,14 +21,34 @@ Every department skill costs a few thousand tokens to load. So:
    move forward.
 4. Carry forward the handoff, not the history.
 
-## Step 0 - Model check (once)
+## Step 0 - Model context (once)
 
-Read the model your own system prompt names. If it is a Fable model (any version), department skills
-run their Principal and Advisor on Fable. If it is any other model - or Fable has run out - they run
-on the fallback: Opus for both. Pass the result to every department as `MODELS: Fable` or
-`MODELS: Fallback - <reason>`. State the model that is actually running; a department checks the line
-against its own system prompt. If a Fable call fails partway through a chain, switch to the fallback
-for the rest of the chain and do not switch back.
+Read the model named by the current system prompt and pass it as
+`MODELS: Advisor <actual session model>; Principal path <Fable | Opus fallback>`. The Advisor stays on
+the session model in Lean and Balanced; do not require Opus merely because the session is not Fable.
+Use the Fable Principal when the session is on Fable and it is available; otherwise use the Opus
+Principal. If a Fable Principal call fails partway through a chain, use Opus for later Principal calls
+and do not redo completed work.
+
+## Step 0.5 - Usage mode and budget
+
+Honor an explicit user choice of **Lean**, **Balanced** or **Assurance**, subject to mandatory upgrades:
+
+- **Lean** - only one department, Small, low-risk, reversible, no live-system action, and no release,
+  disposition, compliance or safety decision. Target at most one tier-agent dispatch.
+- **Balanced** - default for ordinary work and chains. Target at most two tier-agent dispatches per
+  department. A Balanced chain targets at most six tier-agent dispatches total: intermediate
+  departments use one bundled worker, and the final department gets an independent review.
+- **Assurance** - when the user asks for the full process, or for safety, regulatory, security or
+  legal-impact work; live or production changes; destructive or irreversible steps; final release,
+  disposition or risk decisions; or a department trigger 4 or 6. It keeps the full five-stage
+  dispatch and Principal release review.
+
+Use `RUN MODE: <mode> - <one-line reason>` and
+`USAGE BUDGET: <tier-agent target for this department; chain target/used when applicable>`. The router
+may assign Lean to an eligible intermediate department in a Balanced chain. Once a department starts,
+its mode may upgrade but never downgrade. Safety and required Principal calls can exceed the target;
+non-safety extra calls require the user to agree first when they are reachable.
 
 ## Step 1 - Classify
 
@@ -140,8 +160,9 @@ this plugin.
 
 ## Step 3 - Run
 
-**One department.** Invoke the chosen skill with the user's request unchanged, plus the Step 0 and
-Step 1 lines. That skill owns everything from there, including its own Principal and Advisor.
+**One department.** Invoke the chosen skill with the user's request unchanged, plus the Step 0,
+Step 0.5 and Step 1 lines. That skill owns everything from there, including its own Principal and
+Advisor.
 
 **A chain.** Use a named flow when one fits; go only as far along it as the user asked. If the user
 states an order (for example, "brochure, then manual"), that order wins and becomes a custom chain.
@@ -169,11 +190,15 @@ DELIVERABLE: <path, or the text if it is short>
 OPEN ITEMS: <its TBD, REQUIRED INPUT, NOT RUN and discrepancies, each with an owner>
 CHAIN: <flow name> - step <n> of <m>; later steps: <skills still to run>
 ROUTE: <track> / <new | change>
-MODELS: <Fable | Fallback - reason>
+MODELS: <Advisor actual session model; Principal path Fable | Opus fallback>
+RUN MODE: <Lean | Balanced | Assurance> - <reason or upgrade>
+USAGE BUDGET: <department tier-agent target; chain target/used when applicable>
+USAGE SO FAR: <tier-agent dispatches and Principal calls from completed departments>
 ```
 
-The first department gets the user's original request plus the `CHAIN:`, `ROUTE:` and `MODELS:`
-lines. Every department reads those lines even when there is no `HANDOFF:` block yet.
+The first department gets the user's original request plus the `CHAIN:`, `ROUTE:`, `MODELS:`,
+`RUN MODE:`, `USAGE BUDGET:` and `USAGE SO FAR: 0 tier-agent dispatches; 0 Principal calls` lines.
+Every department reads those lines even when there is no `HANDOFF:` block yet.
 
 ### Chain rules
 
@@ -191,7 +216,14 @@ lines. Every department reads those lines even when there is no `HANDOFF:` block
 6. Combined track: run the hardware and software departments of the same step one after the other,
    hardware first. Their interfaces are settled by `jrs:systems-engineering`; if that step was skipped,
    say so in the open items. The step's verdict is the worse of the two.
-7. Size is each department's call. A department in a chain keeps its own Principal review.
+7. Size is each department's call. A department in a chain keeps its own mode-specific review
+   contract and upgrades itself when it finds an Assurance condition.
+8. A Balanced chain targets at most six tier-agent dispatches: one bundled dispatch for each
+   intermediate department and at most two for the final department. Use Lean for an eligible
+   intermediate step. Before exceeding six for a non-safety reason, ask the user whether to continue
+   in Balanced or upgrade to Assurance. Required safety and Principal calls always run.
+9. Add each department's `USAGE:` counts to `USAGE SO FAR:` in the next handoff and aggregate them in
+   the chain report.
 
 ## Ground rules
 
@@ -209,7 +241,8 @@ A single department reports in its own shape. For a chain, report bottom line fi
 ```
 VERDICT: <done | done with open items | blocked at <department>>
 ROUTE: <track> / <new | change> / <flow name or custom chain>
-MODELS: <Fable | Fallback - Opus for Principal and Advisor (reason, from department n)>
+MODELS: <Advisor session model; tier models/count by department; Principal model or not used>
+USAGE: <mode by department; total tier-agent dispatches; total Principal calls; budget status>
 DEPARTMENTS: <skill - verdict - deliverable and path - its PRINCIPAL REVIEW line, one line each>
 SKIPPED: <department - reason>
 DECISIONS MADE FOR YOU: <routing choices and assumptions to confirm or overturn>
@@ -217,4 +250,5 @@ OPEN ITEMS: <merged TBD, REQUIRED INPUT, NOT RUN, discrepancies, tagged by depar
 NEXT: <at most three follow-ups worth doing, if any>
 ```
 
-Leave out any line that has nothing to say.
+Never omit `VERDICT:`, `ROUTE:`, `MODELS:` or `USAGE:`. Leave out any other line that has nothing to
+say.

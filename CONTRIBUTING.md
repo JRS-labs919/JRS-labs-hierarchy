@@ -14,6 +14,7 @@ Run the official validator from the repository root:
 ```sh
 claude plugin validate --strict .
 python3 scripts/check_release.py
+python3 scripts/check_usage_modes.py
 ```
 
 Then load the checkout and exercise the changed skill:
@@ -22,7 +23,9 @@ Then load the checkout and exercise the changed skill:
 claude --plugin-dir .
 ```
 
-For department changes, test both direct invocation (`/jrs:<department>`) and routing through `/jrs:route`.
+For department changes, test both direct invocation (`/jrs:<department>`) and routing through
+`/jrs:route`. Changes to execution, agents or models also run the cases in
+`tests/usage-mode-prompts.md`.
 
 ## Release a change
 

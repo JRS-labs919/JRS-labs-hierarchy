@@ -18,27 +18,58 @@ a sales organisation with the meetings removed.
 | 4 | Deal Review | Deal Desk Analyst | Opus 5.5 | High | Pass/fail per criterion |
 | 5 | Handoff | Sales Operations Analyst / CRM Administrator | Haiku 5.5 | Low | CRM-ready record and next steps |
 
-Each delegated role is dispatched to the plugin's tier agent that matches its row: Opus 5.5 rows
+In Assurance, each delegated role is dispatched to the plugin's tier agent that matches its row: Opus 5.5 rows
 to `senior-high` or `senior-medium`, Sonnet 5.5 rows to `builder-high`, `builder-medium` or
 `builder-low`, Haiku 5.5 rows to `clerk`, and escalations to `principal`. This skill uses `builder-medium`, `clerk`, `senior-high`.
 
-Send one packet per stage, not the conversation:
+## Adaptive usage
+
+Complete all five logical stages in every mode. The mode changes who performs consecutive stages and
+how many tier agents are dispatched; it never removes a ground rule, acceptance criterion or safety
+gate.
+
+- **Lean** - only for Small, low-risk, reversible work that touches no live system and makes no
+  release, disposition, compliance or safety decision. The Advisor runs Stages 1-3 and Stage 5 in the
+  session. It may dispatch one `builder-medium` as the independent Stage 4 reader when the work
+  creates a file, calculation or change; otherwise the Advisor performs Stage 4. Target: at most one
+  tier-agent dispatch and no routine Principal call.
+- **Balanced** - the default. Dispatch one `builder-high` for a consecutive Stages 1-3 bundle and one
+  `senior-high` for Stage 4; the Advisor integrates Stage 5 in the session. An intermediate department
+  in a Balanced chain may use one `builder-high` for Stages 1-3 and let the Advisor perform the
+  independent Stage 4 check and integrate Stage 5. Target: at most two tier-agent dispatches per department.
+- **Assurance** - use when the user asks for it, or for safety, regulatory, security or legal-impact
+  work; a live or production change; a destructive or irreversible step; a final release,
+  disposition or risk decision; or whenever trigger 4 or 6 fires. Dispatch every stage separately to
+  the table agent and run the Principal release review. Target: five tier-agent dispatches plus the
+  Principal calls the evidence requires.
+
+Choose the mode after sizing and say it before Stage 1. Honor an incoming `RUN MODE:` as the
+starting mode only when the job is eligible; an explicit Lean or Balanced request never overrides a
+mandatory Assurance upgrade. Once this department starts, its mode may upgrade but never downgrade. In a Balanced chain the router
+may assign Lean to an eligible intermediate department before it begins. Small work that grows becomes
+Balanced; any Assurance condition upgrades it
+immediately, without waiting for permission. Do not redo a completed stage after an upgrade unless the
+new risk changes its evidence or acceptance criteria.
+
+The targets are usage budgets, not safety caps. A stop-and-ask rule or Principal trigger always runs
+even when it exceeds a target. Before exceeding the target for a non-safety reason, ask the user if
+reachable; otherwise stay within the target and report the unrun work under `OPEN ITEMS`. Count every
+tier-agent dispatch and Principal call for the final `USAGE:` line.
+
+Send one packet for the listed stage or consecutive bundle, not the conversation:
 
 ```
-ROLE: <title from the table>
-STAGE: <n - name>, with that stage's section of this skill
-INPUT: <the handoff from the stage before; the record path if Standard size>
-RULES: <the ground rules of this skill>
-RETURN: <that stage's handoff, plus OPEN ITEMS>
+ROLE: <title or titles from the table>
+STAGES: <one stage in Assurance | consecutive range in Lean or Balanced>, with only those sections
+INPUT: <the prior handoff, inherited open items and record path if Standard>
+RULES: <only the non-negotiable ground rules and department constraints relevant to this work>
+RETURN: <the final handoff for the listed stage or bundle, plus OPEN ITEMS>
 ```
 
-Do not combine stages in one dispatch when the tier agents are available. Stage 5 must be dispatched
-to its listed owner; do not run it in the session when that tier agent is available.
-
-The Advisor does not hand off its own row (planning, gates, integration). The Principal is never
-dispatched for work - only consulted through the escalation protocol below. If the tier agents
-are not available in this environment, the Advisor runs that stage itself and logs
-`<role> model/effort NOT SET - ran in session` in the open items.
+The Advisor plans, gates and integrates; it does not create a separate handoff for its own row. The
+Principal is consulted only through the escalation protocol below. If a required tier agent is not
+available, the Advisor runs that work in the session and logs `<role> model/effort NOT SET - ran in
+session`; it still counts that fallback accurately on `USAGE:` as zero tier-agent dispatches.
 
 **Running inside a subagent.** If you have no tool to dispatch agents and none to ask the user, you are
 running flat: no tier agents, no Principal, and the user cannot be reached. Say so on the report's
@@ -46,34 +77,28 @@ running flat: no tier agents, no Principal, and the user cannot be reached. Say 
 the risk trigger (trigger 6) applies, stop there and return `blocked`, with the questions or the
 escalation packet for your caller to act on. Do not rule on it yourself.
 
-### Fable fallback
+### Model policy
 
-Fable usage can run out, so every job checks the model once at the start and keeps working either way.
+- **Advisor stays in the session.** Lean and Balanced never require a switch to Opus merely because
+  the session is not on Fable. Use the current session model and report it.
+- **Tier agents keep their configured models.** Assurance follows the stage table. Lean and Balanced
+  use the bundled-agent choices in Adaptive usage.
+- **Principal path.** Use `principal` when the system prompt names a Fable model and Fable is
+  available; otherwise use `principal-opus`. A Principal is not called merely to prove that the mode
+  is working.
+- **Incoming model context.** If the request carries a `MODELS:` line, use it only when it agrees with
+  the model named by the current system prompt. Log a mismatch instead of pretending a model ran.
+- **Failure partway through.** If a Fable Principal call fails for usage or availability, switch the
+  Principal path to Opus for the rest of the job and do not switch back. Do not redo completed work.
+- **Say what ran.** The record and report name the Advisor session model, the tier models actually
+  dispatched and the Principal model, or `not used`.
 
-| Role | Fable available | Fallback (no Fable) |
-|---|---|---|
-| Principal | Fable 5.2 / Max | Opus 5.5 / Max |
-| Advisor | Fable 5.2 / Medium | Opus 5.5 / Max |
-| Stages 1-5 | as in the table above | unchanged |
-
-- **Check at the start.** Run on Fable when your system prompt names a Fable model (any version). Use the fallback when the
-  session is on any other model, or when the user says to.
-  If the request arrives with a `MODELS:` line, use it only when it agrees with the model your own
-  system prompt names. If they differ, go by your system prompt and log the mismatch in the open items.
-- **Switch mid-job only on failure.** If a Fable call fails for usage or availability partway
-  through, switch to the fallback for the rest of the job, log the stage where it switched, and do
-  not switch back.
-- **The Advisor runs in the session.** Under fallback the session should be Opus 5.5 at max effort. If
-  it is another model, or the effort cannot be set, carry on and log `ADVISOR <model/effort> -
-  fallback expects Opus 5.5 / Max` in the open items.
-- **Principal agent.** Escalations go to `principal` on Fable and to `principal-opus` under fallback.
-- **Say which ran.** The record and the report carry a `MODELS:` line.
 
 The user is the account owner. Their prompt, plus anything they attached or pointed
 to, **is** the opportunity. Stage 1's job is to turn it into the opportunity brief, not to send
 it back as a questionnaire.
 
-**Router and department handoff.** Read any `CHAIN:`, `ROUTE:` and `MODELS:` lines that accompany
+**Router and department handoff.** Read any `CHAIN:`, `ROUTE:`, `MODELS:`, `RUN MODE:`, `USAGE BUDGET:` and `USAGE SO FAR:` lines that accompany
 the request, including when this is the first department in a chain. If the request also carries a
 `HANDOFF:` block, read the deliverable it points to and carry every inherited open item into your own
 open items with its owner. Use the `ROUTE:` line as the starting point for track and work type. If an
@@ -139,12 +164,13 @@ Escalate to the Principal only when:
 2. Sources conflict and the conflict cannot be resolved from evidence.
 3. A criterion has failed Stage 4 twice (the re-scope point in Stage 4).
 4. The next step is destructive or irreversible.
-5. Release review - every Standard-size job, before Stage 5 delivers.
+5. Assurance release review - before Stage 5 delivers. Lean and Balanced use Stage 4 as the release consistency check unless another trigger upgrades the job.
 6. The deal needs a discount, term or delivery date outside standard policy.
 
-**Small size skips the Principal.** The Advisor does the release review itself, unless trigger 2, 4 or 6
-fires. Trigger 6 is this skill's risk trigger: it applies at every size, and so does every stop-and-ask
-condition.
+**Release review by mode.** Lean and Balanced use Stage 4 as the release consistency check. Assurance
+sends the Principal a trigger-5 release-review packet before Stage 5. Principal triggers 1-4 and 6
+remain available in every mode and at every size. Trigger 6 is this skill's risk trigger: it applies at
+every size, and so does every stop-and-ask condition.
 
 **Escalation packet** - send this, not the full history, so the Principal works from fresh
 context:
@@ -175,7 +201,7 @@ MADE FOR YOU. An Advisor ruling is never reported as a Principal review: the rep
 trigger, the Advisor may only choose the option that changes nothing, and the verdict is `blocked` until
 the user decides.
 
-## Mode
+## Interaction mode
 
 - **autonomous** (default): show each stage's output briefly and keep going. Decisions made on
   the user's behalf are listed in the final report so they can overturn any of them.
@@ -273,8 +299,7 @@ Check what was produced against the opportunity brief, by checking every claim a
 6. Anything that fails goes back to Stage 3. After two failed rounds on the same criterion, stop
    fixing and re-scope it with the user.
 
-Handoff: a pass/fail line per criterion, with evidence, and any `NOT RUN`. Standard size:
-send the Principal a trigger-5 escalation packet with this evidence before Stage 5.
+Handoff: a pass/fail line per criterion, with evidence, and any `NOT RUN`. In Assurance mode, send the Principal a trigger-5 escalation packet with this evidence before Stage 5.
 
 ## Stage 5 - Handoff (Sales Operations Analyst / CRM Administrator)
 
@@ -290,25 +315,27 @@ this literal fenced report block with the exact uppercase labels; do not replace
 
 ```
 VERDICT: <done | done with open items | blocked> - <n>/<n> criteria passed
-MODELS: <Fable | Fallback - Opus 5.5 / Max for Principal and Advisor (reason, from Stage n)> [- RAN FLAT when applicable]
+MODELS: <Advisor session model; tier agents models/count or not used; Principal model or not used> [- RAN FLAT when applicable]
+USAGE: <Lean | Balanced | Assurance> - <n tier-agent dispatches; n Principal calls; budget met | exceeded for safety: reason>
 DELIVERED: <deliverable and path, one line each>
 HOW TO USE: <steps>
 CHANGED: <what changed - change work only>
 BRANCH: <not needed | inline | jrs:sales-applications-engineering stages x-y, verdict>
-PRINCIPAL REVIEW: <not used (Small); Advisor release review: consistent / consistent with conditions / not consistent | n rulings; Advisor release review (Small): consistent / consistent with conditions / not consistent | n rulings; Principal release review: consistent / consistent with conditions / not consistent | NOT REVIEWED - Principal not available>
+PRINCIPAL REVIEW: <not used; Stage 4 release check: consistent / consistent with conditions / not consistent (Lean/Balanced) | n rulings; Stage 4 release check: consistent / consistent with conditions / not consistent (Lean/Balanced) | n rulings; Principal release review: consistent / consistent with conditions / not consistent (Assurance) | NOT REVIEWED - Principal not available>
 DECISIONS MADE FOR YOU: <assumptions and provisional choices to confirm or overturn>
 OPEN ITEMS: <TBD, REQUIRED INPUT, NOT RUN, discrepancies>
 NEXT: <at most three follow-ups worth doing, if any>
 ```
 
-Leave out any line that has nothing to say.
+Never omit `VERDICT:`, `MODELS:`, `USAGE:` or `PRINCIPAL REVIEW:`. Leave out any other line that has nothing to say.
 
 ## Record template (Standard size only)
 
 ```markdown
 # <Name> - jrs:sales
 Track: Hardware | Software | Combined    Work: new | change    Size: Standard    Mode: autonomous | gated
-Models: Fable | Fallback - <reason>, from Stage <n>
+Models: Advisor <model>; tier agents <models/count or not used>; Principal <model or not used>
+Usage: Lean | Balanced | Assurance - <tier-agent dispatches; Principal calls; budget status>
 
 ## 1. Qualify
 Customer and need:

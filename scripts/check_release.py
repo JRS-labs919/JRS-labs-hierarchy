@@ -57,19 +57,40 @@ for department in departments:
         "Trigger 6 is this skill's risk trigger",
         "PRINCIPAL REVIEW:",
         "[- RAN FLAT when applicable]",
-        "Do not combine stages in one dispatch",
+        "## Adaptive usage",
+        "**Lean**",
+        "**Balanced**",
+        "**Assurance**",
+        "Target: at most one",
+        "Target: at most two",
+        "Target: five tier-agent",
+        "mandatory Assurance upgrade",
+        "Honor an incoming `RUN MODE:`",
+        "`USAGE SO FAR:` lines",
+        "USAGE: <Lean | Balanced | Assurance>",
+        "n rulings; Stage 4 release check:",
+        "Never omit `VERDICT:`, `MODELS:`, `USAGE:` or `PRINCIPAL REVIEW:`",
+        "Stage 4 as the release consistency check",
         "material edit to reviewed content invalidates that review",
         "literal fenced report block",
-        "Advisor release review (Small)",
         "department date-and-topic path below is for Standard records only",
     ):
         require(required in text, f"{label}: missing {required}")
 
-    for forbidden in ("sign-off: approved", "signs off itself", "session is on Fable 5.2", "<slug>"):
+    for forbidden in (
+        "sign-off: approved",
+        "signs off itself",
+        "session is on Fable 5.2",
+        "<slug>",
+        "### Fable fallback",
+        "every Standard-size job",
+        "Do not combine stages in one dispatch",
+        "MODELS: <Fable | Fallback",
+    ):
         require(forbidden not in text, f"{label}: obsolete text remains: {forbidden}")
 
     escalation = re.search(
-        r"Escalate to the Principal only when:\n(.*?)\n\*\*Small size",
+        r"Escalate to the Principal only when:\n(.*?)\n\*\*Release review by mode",
         text,
         re.DOTALL,
     )
@@ -100,6 +121,12 @@ for required in (
     "that order wins and becomes a custom chain",
     "final priced quote, only when supply chain ran",
     "flag applicability and legal",
+    "## Step 0.5 - Usage mode and budget",
+    "A Balanced chain targets at most six tier-agent dispatches total",
+    "RUN MODE: <Lean | Balanced | Assurance>",
+    "USAGE BUDGET:",
+    "USAGE SO FAR:",
+    "USAGE: <mode by department; total tier-agent dispatches",
 ):
     require(required in route_text, f"router: missing {required}")
 
@@ -121,5 +148,14 @@ for principal in ("principal.md", "principal-opus.md"):
     text = (AGENTS / principal).read_text()
     require("consistent with conditions" in text, f"{principal}: review vocabulary missing")
     require("It is not an approval" in text, f"{principal}: human-approval boundary missing")
+
+for tier in sorted(agent_names - {"principal", "principal-opus"}):
+    text = (AGENTS / f"{tier}.md").read_text()
+    require("STAGES: one stage in Assurance" in text, f"{tier}: stage-bundle packet missing")
+    require("consecutive stage bundle" in text, f"{tier}: bundled execution missing")
+    require("Be concise:" in text, f"{tier}: concise handoff rule missing")
+
+require((ROOT / "tests" / "usage-mode-prompts.md").exists(), "usage-mode prompt tests missing")
+require((ROOT / "scripts" / "check_usage_modes.py").exists(), "usage-mode contract checker missing")
 
 print(f"Release consistency checks passed for JRS {version}: 26 departments, 8 agents.")
